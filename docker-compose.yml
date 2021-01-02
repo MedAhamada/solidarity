@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  database:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mutuellesdb
+      MYSQL_USER: recur
+      MYSQL_PASSWORD: R3curPassword
+    volumes:
+      - solidarity_data:/var/lib/mysql
+    restart: on-failure
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    depends_on:
+      - database
+    ports:
+      - 8080:8080
+
+volumes:
+  solidarity_data: {}
