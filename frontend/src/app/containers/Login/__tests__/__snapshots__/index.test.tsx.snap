@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Login /> should match the snapshot 1`] = `
+<div
+  class=""
+>
+  <h1>
+    My App
+  </h1>
+  <p>
+    This can be anywhere in your application access=
+  </p>
+  <form
+    action="#"
+  >
+    <h1>
+      Login
+    </h1>
+    <input
+      name="email"
+      type="email"
+      value=""
+    />
+    <input
+      name="password"
+      type="password"
+      value=""
+    />
+    <button
+      type="submit"
+    >
+      Submit
+    </button>
+  </form>
+  <button>
+    Click
+  </button>
+</div>
+`;

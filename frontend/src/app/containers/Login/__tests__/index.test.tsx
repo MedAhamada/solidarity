@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import { Store } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { HelmetProvider } from 'react-helmet-async';
+import history from 'utils/history';
 
 import { configureAppStore } from 'store/configureStore';
 import { Login } from '..';
@@ -20,10 +21,10 @@ describe('<Login />', () => {
   let store: ReturnType<typeof configureAppStore>;
 
   beforeEach(() => {
-    store = configureAppStore();
+    store = configureAppStore(history);
   });
   it('should match the snapshot', () => {
-    const component = renderComponent(store);
+    const component = renderComponent(store.store);
     expect(component.container.firstChild).toMatchSnapshot();
   });
 });
