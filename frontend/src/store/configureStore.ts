@@ -2,49 +2,61 @@
  * Create the store with dynamic reducers
  */
 
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import { createInjectorsEnhancer } from 'redux-injectors';
+import {
+  configureStore,
+  getDefaultMiddleware,
+  Middleware,
+} from '@reduxjs/toolkit';
+import { createInjectorsEnhancer, forceReducerReload } from 'redux-injectors';
 import createSagaMiddleware from 'redux-saga';
-
-import createReducer from './reducers';
-import storage from "redux-persist/lib/storage";
+import { routerMiddleware } from 'connected-react-router';
+import { History } from 'history';
+import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer, PERSIST } from 'redux-persist';
-import {routerMiddleware} from "connected-react-router";
-import history from "../utils/history";
-import rootSaga from './sagas';
 
-export default function configureAppStore(preloadedState = {}) {
+import { createReducer } from './reducers';
 
+export function configureAppStore(history?: History, preloadedState = {}) {
   const persistConfig = {
     key: 'root',
-    whitelist: [],
     storage,
+    whitelist: [],
   };
-  const persistedReducer = persistReducer(persistConfig, createReducer);
+  const persistedReducer = persistReducer(persistConfig, createReducer());
 
-  const sagaMiddleware = createSagaMiddleware();
+  const reduxSagaMonitorOptions = {};
+  const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions);
+  const { run: runSaga } = sagaMiddleware;
 
-  const middleware = [
-    ...getDefaultMiddleware({
-      serializableCheck: {
-        // see https://github.com/rt2zz/redux-persist/issues/988#issuecomment-529575333 to ignore actions for serializable check
-        ignoredActions: [PERSIST],
-      },
+  // Create the store with saga middleware
+  const middlewares = [sagaMiddleware] as Middleware[];
+  if (history) {
+    middlewares.push(routerMiddleware(history));
+  }
+
+  const enhancers = [
+    createInjectorsEnhancer({
+      createReducer,
+      runSaga,
     }),
-    routerMiddleware(history),
-    sagaMiddleware,
   ];
 
   const store = configureStore({
-    devTools: process.env.NODE_ENV !== 'production',
-    middleware,
     reducer: persistedReducer,
+    middleware: [
+      ...getDefaultMiddleware({
+        serializableCheck: {
+          // see https://github.com/rt2zz/redux-persist/issues/988#issuecomment-529575333 to ignore actions for serializable check
+          ignoredActions: [PERSIST],
+        },
+      }),
+      ...middlewares,
+    ],
+    devTools: process.env.NODE_ENV !== 'production',
     preloadedState,
+    enhancers,
   });
-
-
   const persistor = persistStore(store);
-  sagaMiddleware.run(rootSaga);
 
   /* istanbul ignore next */
   if (process.env.NODE_ENV !== 'production' && module.hot) {
@@ -52,6 +64,5 @@ export default function configureAppStore(preloadedState = {}) {
       import('./reducers').then(() => store.replaceReducer(persistedReducer));
     });
   }
-
   return { store, persistor };
 }

@@ -10,45 +10,23 @@ import * as React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
 import { HomePage } from './containers/HomePage/Loadable';
+import { App as AppPage } from './containers/App';
 import { NotFoundPage } from './components/NotFoundPage/Loadable';
-import Root from './components/Root/Root.component';
-import { Store } from 'redux';
-import { Persistor } from 'redux-persist';
-import { ConnectedRouter } from 'connected-react-router';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Provider } from 'react-redux';
-import { createMuiTheme } from '@material-ui/core';
-import history from '../utils/history';
-import { ThemeProvider } from 'styled-components';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
-import { HelmetProvider } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
+import { Suspense } from 'react';
+import { Login } from './containers/Login';
 
-interface Props {
-  persistor: Persistor;
-  store: Store;
+export function App() {
+  const { i18n } = useTranslation();
+  return (
+    <AppPage>
+      <Suspense fallback={<div className="loader" />}>
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+          <Route exact path="/login" component={Login} />
+          <Route component={NotFoundPage} />
+        </Switch>
+      </Suspense>
+    </AppPage>
+  );
 }
-const theme = createMuiTheme();
-
-const App: React.FunctionComponent<Props> = ({ persistor, store }: Props) => (
-  <Provider store={store}>
-    <ConnectedRouter history={history}>
-      <ThemeProvider theme={theme}>
-        <PersistGate loading={null} persistor={persistor}>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <HelmetProvider>
-              <Root>
-                <Switch>
-                  <Route exact path="/" component={HomePage} />
-                  <Route component={NotFoundPage} />
-                </Switch>
-              </Root>
-            </HelmetProvider>
-          </MuiPickersUtilsProvider>
-        </PersistGate>
-      </ThemeProvider>
-    </ConnectedRouter>
-  </Provider>
-);
-
-export default App;

@@ -16,7 +16,6 @@ export class UsersService extends TypeOrmCrudService<User> {
     }
 
     findOneByUserNameOrEmail(usernameOrEmail: string): Promise<User> {
-        console.log(usernameOrEmail);
         return this.usersRepository.findOne({
             where: [
                 {username: usernameOrEmail},
