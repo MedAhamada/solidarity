@@ -7,7 +7,7 @@ import {
   getDefaultMiddleware,
   Middleware,
 } from '@reduxjs/toolkit';
-import { createInjectorsEnhancer, forceReducerReload } from 'redux-injectors';
+import { createInjectorsEnhancer } from 'redux-injectors';
 import createSagaMiddleware from 'redux-saga';
 import { routerMiddleware } from 'connected-react-router';
 import { History } from 'history';

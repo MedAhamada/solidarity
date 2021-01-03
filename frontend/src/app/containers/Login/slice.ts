@@ -23,6 +23,10 @@ const loginSlice = createSlice({
       state.accessToken = action.payload;
       return state;
     },
+    logout(state: ContainerState, action: PayloadAction<any>) {
+      state.accessToken = null;
+      return state;
+    },
   },
 });
 
